@@ -1,6 +1,41 @@
 
 
+-- bypasses (humanoid,walkspeed, godmode)
+function godmode()
+local mt = getrawmetatable(game)
+setreadonly(mt,false)
+local old = mt.__index
+mt.__index = newcclosure(function(self,vis)
+    if self == "kills" and vis == "Parent" then
+        return vis.Parent
+    end
+    return old(self,vis)
+end)
+end
 
+
+
+local mt = getrawmetatable(game)
+setreadonly(mt,false)
+local old = mt.__index
+mt.__index = newcclosure(function(self,ww)
+    if ww == "WalkSpeed" then
+        return game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+    end
+    return old(self,ww)
+end)
+
+
+
+local mt = getrawmetatable(game)
+setreadonly(mt,false)
+local old = mt.__index
+mt.__index = newcclosure(function(self,ww)
+    if ff == "JumpPower" then
+        return game.Players.LocalPlayer.Character.Humanoid.JumpPower
+    end
+    return old(self,ww)
+end)
 
 
 
@@ -2037,6 +2072,21 @@ function library:AddWindow(title, options)
 end
 
 
+local upgrades = {}
+for i,v in pairs(require(game:GetService("ReplicatedStorage").Library.Modules.Upgrades)) do
+    table.insert(upgrades,i)
+end
+
+
+local bosses = {}
+for i,v in pairs(game:GetService("Workspace").BossZones:GetChildren()) do
+ table.insert(bosses,v)
+end
+
+
+
+
+
 local teleport = {}
 
 
@@ -2045,17 +2095,15 @@ for i,v in pairs(game:GetService("Workspace").Worlds:GetChildren()) do
 end
 
 local thing = {}
+
 for i,v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Frames.Rebirths.ImageLabel.Tabs.Rebirths:GetChildren()) do
     if v:IsA("ImageButton") then
 table.insert(thing,v.InfoLabel.Text)
+wait()
+        end
     end
-end
 
-
-
-
-
-local Window = library:AddWindow("Cheeto Hub | Anime Clickers | RightControl UI Toggle Key", {
+local Window = library:AddWindow("Cheeto Hub | Anime Clickers | RightShift UI Toggle Key", {
 		main_color = Color3.fromRGB(41, 74, 122),
 		min_size = Vector2.new(500, 600),
 		toggle_key = Enum.KeyCode.RightControl,
@@ -2063,11 +2111,15 @@ local Window = library:AddWindow("Cheeto Hub | Anime Clickers | RightControl UI 
 	})
 
 local tab1 = Window:AddTab("Main")
+local tab2 = Window:AddTab("Egg")
+local tab3 = Window:AddTab("Teleports")
+local tab4 = Window:AddTab("Rebirth")
+local tab5 = Window:AddTab("Upgrades")
 
 
 tab1:AddSwitch( "Auto Click",function(value)
-   tog = value
-while tog do wait()
+   autoclick = value
+while autoclick do wait(0.1)
 local ohBoolean1 = true
 local ohString2 = "Clicker!"
 
@@ -2075,10 +2127,28 @@ game:GetService("ReplicatedStorage").Remotes.ClickRemote:FireServer(ohBoolean1, 
     end
 end)
 
+local selectauto = tab1:AddDropdown("Select Auto Click Boss",function(selected)
+    boss = selected
+end)
+
+for i = 1,#bosses do
+    local upd = selectauto:Add(bosses[i])
+end
+
+tab1:AddSwitch("Auto Click Boss",function(value)
+    clickboss = value
+    while clickboss do wait(0.1)
+local ohBoolean1 = true
+local ohString2 = "Clicker!"
+local ohString3 =  boss
+
+game:GetService("ReplicatedStorage").Remotes.ClickRemote:FireServer(ohBoolean1, ohString2, ohString3)
+    end
+end)
 
 
 
-local dropdown = tab1:AddDropdown("Select Egg to Open", function(text)
+local dropdown = tab2:AddDropdown("Select Egg to Open", function(text)
   selected = text
 end)
 for i = 1,#tb do
@@ -2086,9 +2156,9 @@ local a = dropdown:Add(tb[i])
 end
 
 
-tab1:AddSwitch("Auto Egg Open",function(value)
-    tog = value
-    while tog do wait(0.1)
+tab2:AddSwitch("Auto Egg Open",function(value)
+    autoopen = value
+    while autoopen do wait(0.1)
 local ohString1 = selected
 local ohBoolean2 = false
 local ohBoolean3 = false
@@ -2101,7 +2171,7 @@ end)
 
 
 
-local ports = tab1:AddDropdown("Teleports",function(text)
+local ports = tab3:AddDropdown("Teleports",function(text)
     teleports = text
     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game:GetService("Workspace").Worlds[teleports].Spawn.Position)
     
@@ -2111,17 +2181,42 @@ local a = ports:Add(teleport[i])
 end
 
 
-local rebirths = tab1:AddDropdown("Select Auto Rebirth",function(text)
+local rebirths = tab4:AddDropdown("Select Auto Rebirth",function(text)
     rebirth = text
+
 end)
-for i = 1,#thing do
-    local ba = rebirths:Add(thing[i])
+
+    for i,v in pairs(thing) do
+    local hello = rebirths:Add(thing[i])
 end
 
-tab1:AddSwitch("Auto Rebirth",function(value)
-    tog = value
+
+
+
+tab4:AddSwitch("Auto Rebirth",function(value)
+    tog2 = value
+    while tog2 do wait()
     for i = 1,#rebirth do
     local ohNumber1 = #rebirth - i
 game:GetService("ReplicatedStorage").Remotes.RebirthRemote:FireServer(ohNumber1)
+        end
     end
+end)
+    
+tab4:AddLabel("Reexecute the script if you upgrade your rebirths. It doesn't auto update")
+tab4:AddLabel("because there's no update dropdown function in the UI library.")
+
+
+local  upgradedropdown = tab5:AddDropdown("Select Upgrade",function(selectedd)
+    selectedupgrade = selectedd
+end)
+
+for i = 1,#upgrades do
+local thingwingy = upgradedropdown:Add(upgrades[i])
+end
+
+tab5:AddSwitch("Auto Upgrade",function(value)
+local ohString1 = selectedupgrade
+
+game:GetService("ReplicatedStorage").Remotes.RequestUpgrade:FireServer(ohString1)
 end)
