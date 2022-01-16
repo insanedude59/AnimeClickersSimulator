@@ -1,41 +1,6 @@
 
 
--- bypasses (humanoid,walkspeed, godmode)
-function godmode()
-local mt = getrawmetatable(game)
-setreadonly(mt,false)
-local old = mt.__index
-mt.__index = newcclosure(function(self,vis)
-    if self == "kills" and vis == "Parent" then
-        return vis.Parent
-    end
-    return old(self,vis)
-end)
-end
 
-
-
-local mt = getrawmetatable(game)
-setreadonly(mt,false)
-local old = mt.__index
-mt.__index = newcclosure(function(self,ww)
-    if ww == "WalkSpeed" then
-        return game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
-    end
-    return old(self,ww)
-end)
-
-
-
-local mt = getrawmetatable(game)
-setreadonly(mt,false)
-local old = mt.__index
-mt.__index = newcclosure(function(self,ww)
-    if ff == "JumpPower" then
-        return game.Players.LocalPlayer.Character.Humanoid.JumpPower
-    end
-    return old(self,ww)
-end)
 
 
 
